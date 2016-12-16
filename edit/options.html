@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>editing options for </title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/setup.js"></script>
+<script src="../js/get_test_info.js"></script>
+<script>
+$(document).ready(function() {
+	// Editing query value of URLs
+	$('a[href]:has(.testName)').each(function() {
+		$(this).attr('href', $(this).attr('href') + getQueryString('id'));	
+	});
+
+	// Set initial values of the options
+	get_test_info(function(data) {
+		for(var k in data.options) {
+			$('input[type=checkbox][name="' +k+ '"]').attr('checked', data.options[k]);
+		}
+	});
+
+	// Submit
+	$('.saveBtn').on('click', function() {
+		// save input into object
+		var data = {};
+		$('input[type=checkbox][name]').each(function() {
+			var $checkbox = $(this);
+			data[$checkbox.attr('name')] = $checkbox.is(':checked');
+		});
+
+		// send ajax request to edit options
+		$('#ajaxStatus').html('Loading...');
+		$.ajax({
+			url: '../php/edit_options.php',
+			data: {id: getQueryString('id'), data: data},
+			success: function(response) {
+				$('#ajaxStatus').html(response);
+			}
+		});
+
+	});
+
+});
+</script>
+<style>
+label {
+	cursor: pointer;
+	display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='../index.html'>testing</a>
+	<a href='../edit.html'>edit tests</a>
+	<a href='index.html?id='><span class='testName'/></a>
+	<a>options</a>
+</div>
+
+<!-- Contents -->
+<h1>editing options for <span class='testName'/></h1>
+
+<p>
+	<label><input type='checkbox' name='shuffle'/> Randomize order of questions</label>
+	<label><input type='checkbox' name='multiline_response'/> Questions and answers span multiple lines</label>
+</p>
+
+<input type='button' value='save' class='saveBtn'/>
+<input type='button' value='cancel' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>

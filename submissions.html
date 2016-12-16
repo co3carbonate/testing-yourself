@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>view submissions</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="js/jquery.min.js"></script>
+<script src="js/setup.js"></script>
+<script>
+$(document).ready(function() {
+	// Load json/submission_list.json for information on all submissions
+	$.ajax({
+		url: 'json/submission_list.json',
+		dataType: 'JSON',
+		success: function(data) {
+			// Loop through submissions and create contents array
+			var contents = [];
+			var prev_date = new Date(0); // defaults to Jan 1 1970
+			for(var i = data.length - 1; i >= 0; i--) {
+				// If this submission is on a different day from the previous,
+				// create new element container
+				var current_date = new Date(0);
+				current_date.setUTCSeconds(data[i].id);
+				if(current_date.toDateString() != prev_date.toDateString()) {
+					contents.push({
+						'day': dateStr(data[i].id),
+						'content': ''
+					});
+				}
+
+				contents[contents.length - 1].content +=
+					'<li><a target="_blank" href="submission/?id=' +data[i].id+ '">' +
+					data[i].name+ ' submission at ' +formatAMPM(current_date)+
+					'</a></li>';
+				prev_date = current_date;
+			}
+
+			// Set #submissions
+			var content = '';
+			for(var i = 0, l = contents.length; i < l; i++) {
+				content += 
+					'<h2>' +contents[i].day+ '</h2>' +
+					'<ul>' +contents[i].content+ '</ul>';
+			}
+			$('#submissions').html(content);
+		}
+	});
+});
+</script>
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='index.html'>testing</a>
+	<a>view submissions</a>
+</div>
+
+<!-- Contents -->
+
+<h1>view submissions</h1>
+
+<div id='submissions'></div>
+
+<input type='button' value='done' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>

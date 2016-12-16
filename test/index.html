@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>taking </title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/setup.js"></script>
+<script src="../js/get_test_info.js"></script>
+<script>
+$(document).ready(function() {
+	// Load data about the test
+	get_test_info(function(data) {
+
+		// Setup
+		var $question = $('.main .question'),
+			$answer = $('.main .answer');
+		var qn_last = data.questions.length - 1,
+			qn_index = 0;
+		var answers = [];
+
+		// If this test has no questions
+		if(data.questions.length == 0) {
+			$('.main, .nextBtn').css('display', 'none');
+			$('#ajaxStatus').html('This test currently has no questions.');
+			return;
+		}
+
+		// Add .index to each element in data.questions
+		// to keep track of the original index (after shuffling)
+		for(var i = 0; i <= qn_last; i++) {
+			data.questions[i].index = i;
+		}
+
+		// Tweaks based on options
+		if(data.options.shuffle) { // shuffle questions order
+			shuffle(data.questions);
+		}
+		if(!data.options.multiline) { // allow 'Enter' to next question
+			$answer.on('keydown', function(e) {
+				if(e.keyCode == 13) {
+					e.preventDefault();
+					$('.nextBtn').click();
+				}
+			});
+		}
+
+		// Initialize question with qn_index
+		function init_qn() {
+			if(qn_index == qn_last) {
+				// last question
+				$('.nextBtn').val('done');
+			}
+			if(qn_index > qn_last) {
+				// all questions done
+				submit();
+				return;
+			}
+			// normal question behavior
+			// (change hash, set question text, focus answer box)
+			var qn = data.questions[qn_index];
+			$question.html('Q' +(qn_index + 1)+ ': ' +qn.question);
+			$answer.focus();
+		}
+		init_qn();
+		
+		// Next question
+		$('.nextBtn').on('click', function() {
+			answers.push({
+				question: data.questions[qn_index].index,
+				answer: trim_br($('.answer').html())
+			});
+			$('.answer').html('');
+			qn_index++;
+			init_qn();
+		});
+
+		// Submit answers
+		function submit() {
+			$('.nextBtn, .backBtn').off('click');
+			$('.nextBtn, .backBtn').attr('disabled', true);
+			$('.main').css('display', 'none');
+			answers.sort(function(a, b) {
+				return a.question > b.question;
+			});
+
+			// send ajax request to edit questions
+			$('#ajaxStatus').html('Loading...');
+			$.ajax({
+				url: '../php/create_submission.php',
+				data: {id: getQueryString('id'), data: answers},
+				success: function(response) {
+					if(response.indexOf('submission/?id=') == -1) {
+						$('#ajaxStatus').html(response);
+						return;
+					}
+					$('#ajaxStatus').html('');
+					window.location.href = response;
+				}
+			});
+		}
+	});
+});
+</script>
+<style>
+.main {
+	display: inline-block;
+	border: 1px solid black;
+	font-size: 24px;
+	max-width: 100%;
+	word-wrap: break-word;
+}
+.question {
+	text-align: center;
+	font-weight: bold;
+}
+.question, .answer {
+	width: 100%;
+	display: inline-block;
+	border: 1px solid black;
+	
+	box-sizing: border-box;
+	padding: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='../index.html'>testing</a>
+	<a href='../test.html'>take tests</a>
+	<a><span class='testName'/></a>
+</div>
+
+<!-- Contents -->
+<h1>taking <span class='testName'/></h1>
+
+<div class='main'>
+	<div class='question'>Question</div><br/>
+	<div class='answer' contenteditable='true'></div><br/>
+</div>
+
+<br/>
+
+<input type='button' value='next question' class='nextBtn'/>
+<input type='button' value='cancel' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>

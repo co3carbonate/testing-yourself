@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>editing </title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/setup.js"></script>
+<script src="../js/get_test_info.js"></script>
+<script>
+$(document).ready(function() {
+	get_test_info(function(data) {
+	
+	});
+
+	// Editing query value of URLs
+	$('ul a[href]').each(function() {
+		$(this).attr('href', $(this).attr('href') + getQueryString('id'));	
+	});
+
+});
+</script>
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='../index.html'>testing</a>
+	<a href='../edit.html'>edit tests</a>
+	<a><span class='testName'/></a>
+</div>
+
+<!-- Contents -->
+<h1>editing <span class='testName'/></h1>
+
+<ul>
+	<li><a href='options.html?id='>edit options</a></li>
+	<li><a href='questions.html?id='>edit questions</a></li>
+</ul>
+
+<input type='button' value='done' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>

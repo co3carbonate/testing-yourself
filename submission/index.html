@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>viewing submission for </title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/setup.js"></script>
+<script>
+$(document).ready(function() {
+	// Retrieve information about this submission
+	var id = getQueryString('id');
+	$.ajax({
+		url: '../json/submissions/submission_' +id+ '.json',
+		dataType: 'JSON',
+		success: function(data) {
+			// Now, we have the data/information about this submission
+			// testName
+			$('.testName').html(data.name);
+			$('title').append(data.name);
+
+			// Add date into #dateString
+			var date = new Date(0);
+			date.setUTCSeconds(id);
+			$('#dateString').html(
+				dateStr(id)+ ' at ' +formatAMPM(date)
+			);
+
+			// Put data into #table
+			var content = '';
+			for(var i = 0, l = data.questions.length; i < l; i++) {
+				content += ('<tr>' +
+					'<td>' +(i+1)+ '</td>' +
+					'<td>' +data.questions[i].question+ '</td>' +
+					'<td>' +data.questions[i].user_answer+ '</td>' +
+					'<td>' +data.questions[i].answer+ '</td>' +
+				'</tr>');
+			}
+			$('tbody').html(content);
+
+		}
+	});
+});
+</script>
+<style>
+#table {
+	width: 100%;
+	word-wrap: break-word;
+	table-layout: fixed;
+}
+#table td:nth-child(1), #table th:nth-child(1) {
+	width: 3%;
+	text-align: right;
+}
+#table td:nth-child(2), #table th:nth-child(2) {
+	width: 27%;
+}
+#table td:nth-child(3), #table th:nth-child(3) {
+	width: 35%;
+}
+#table td:nth-child(4), #table th:nth-child(4) {
+	width: 35%;
+}
+h1 {
+	margin-bottom: 0px;
+}
+</style>
+</head>
+<body>
+
+<!-- Page navigation --> 
+<div class='pageNav'>
+	<a href='../index.html'>testing</a>
+	<a href='../submissions.html'>view submissions</a>
+	<a><span class='testName'></span> submission</a>
+</div>
+
+<!-- Contents -->
+<h1>viewing submission for <span class='testName'></h1>
+
+<p>Submitted on <span id='dateString'></span>.</p>
+
+<table id='table' class='border'>
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Question</th>
+			<th>User's Answer</th>
+			<th>Actual Answer</th>
+		</tr>
+	</thead>
+	<tbody>
+
+	</tbody>
+</table>
+
+<input type='button' value='done' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+
+</body>
+</html>

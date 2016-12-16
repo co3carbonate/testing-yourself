@@ -1,0 +1,48 @@
+/* Page navigation */
+.pageNav {
+	width: 100%;
+	text-align: center;
+}
+
+/* AJAX Status */
+#ajaxStatus {
+	display: block;
+	margin-top: 20px;
+	color: red;
+}
+
+/* Buttons */
+input[type=button] {
+	cursor: pointer;
+}
+input[type=button]:disabled {
+	cursor: auto;
+}
+.backBtn {
+	margin-top: 20px;
+}
+
+/* Table generic */
+table td, table th {
+	padding: 8px;
+}
+
+/* Table form */
+table.form {
+	margin-bottom: 20px;
+}
+table.form td {
+	padding: 4px;
+}
+table.form td:first-child {
+	text-align: right;
+}
+
+/* Table border */
+table.border {
+	border-collapse: collapse;
+}
+table.border th, table.border td {
+	border: 1px solid black;
+}
+

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>edit test</title>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="js/jquery.min.js"></script>
+<script src="js/setup.js"></script>
+<script>
+var test_list_options = {
+	RowEndHTML: function(data) {
+		return '<td><a href="edit/?id=' +data.id+ '"><input type="button" value="edit"/></a></td>';
+	}
+};
+</script>
+<script src="js/test_list.js"></script>
+
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='index.html'>testing</a>
+	<a>edit tests</a>
+</div>
+
+<!-- Contents -->
+
+<h1>edit test</h1>
+
+<table id='test_list'></table>
+
+<input type='button' value='done' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>

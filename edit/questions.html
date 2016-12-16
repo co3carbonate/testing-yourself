@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>editing questions for </title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/setup.js"></script>
+<script src="../js/get_test_info.js"></script>
+<script>
+$(document).ready(function() {
+	// Editing query value of URLs
+	$('a[href]:has(.testName)').each(function() {
+		$(this).attr('href', $(this).attr('href') + getQueryString('id'));	
+	});
+
+	// Load initial test info onto table
+	get_test_info(function(data) {
+		// no questions
+		var l = data.questions.length;
+		if(l == 0) {
+			$('#noQnsFoundRow').css('display', '');
+			return;
+		}
+
+		// loop through each question, generate row
+		var body = '';
+		for(var i = 0; i < l; i++) {
+			body += '<tr>'+
+				'<td>' +(i+1)+ '</td>'+
+				'<td>' +data.questions[i].question+ '</td>' +
+				'<td>' +data.questions[i].answer+ '</td>' +
+				'<td>' +'<input type="button" value="edit" class="editBtn"/> '
+					   +'<input type="button" value="delete" class="deleteBtn"/>'+ '</td>'+
+			'</tr>';
+		}
+		$('tbody').html(body);
+
+		// tweaks based on options
+		if(!data.options.multiline_response) { // allow 'Enter' key to trigger .doneBtn
+			$('tbody').on('keydown', 'td[contenteditable=true]', function(e) {
+				if(e.keyCode == 13) {
+					e.preventDefault();
+					$(this).parents('tr').find('.doneBtn').click();
+				}
+			});
+		}
+
+	});
+
+	// Create new row
+	$('.addBtn').on('click', function() {
+		$new_row = $('<tr>'+
+			'<td>' +($('tbody tr').length+1)+ '</td>'+
+			'<td></td>'+
+			'<td></td>'+
+			'<td>' +'<input type="button" value="edit" class="editBtn"/> '
+				   +'<input type="button" value="delete" class="deleteBtn"/>'+ '</td>'+
+		'</tr>');
+		$('tbody').append($new_row);
+		$new_row.find('.editBtn').click();
+		$('#noQnsFoundRow').css('display', 'none'); // hide "no questions found" row
+	});
+
+	// Edit row
+	$('tbody').on('click', '.editBtn', function() {
+		$('.doneBtn').click();
+		$(this).removeClass('editBtn').addClass('doneBtn').val('done');
+		var $td = $(this).parents('tr').children('td');
+		$td.slice(1, 3).attr('contenteditable', true);
+		setTimeout(function() {
+			$td.eq(1).focus();
+		}, 0);
+	});
+
+	// Done editing row
+	$('tbody').on('click', '.doneBtn', function() {
+		$(this).removeClass('doneBtn').addClass('editBtn').val('edit');
+		var $td = $(this).parents('tr').children('td');
+		$td.slice(1, 3).attr('contenteditable', false);
+	});
+
+	// Delete row
+	$('tbody').on('click', '.deleteBtn', function() {
+		var $tr = $(this).parents('tr');
+		var index = $tr.index();
+		$tr.remove();
+
+		// reduce indices of the remaining rows
+		var $rows = $('tbody tr');
+		for(var i = index, l = $rows.length; i < l; i++) {
+			$rows.eq(i).children('td').eq(0).html(i + 1);
+		}
+
+		// show "no questions found" row if no more rows
+		if($('tbody tr').length == 0) {
+			$('#noQnsFoundRow').css('display', '');
+		}
+	});
+
+	// Save changes
+	$('.saveBtn').on('click', function() {
+		$('.doneBtn').click();
+
+		// put data into array
+		var data = [];
+		$('tbody tr').each(function() {
+			var $td = $(this).children('td');
+			data.push({
+				question: trim_br($td.eq(1).html()),
+				answer: trim_br($td.eq(2).html())
+			});
+		});
+
+		// send ajax request to edit questions
+		$('#ajaxStatus').html('Loading...');
+		$.ajax({
+			url: '../php/edit_questions.php',
+			data: {id: getQueryString('id'), data: data},
+			success: function(response) {
+				$('#ajaxStatus').html(response);
+			}
+		});
+
+	});
+
+	
+});
+</script>
+<style>
+#table {
+	width: 100%;
+	word-wrap: break-word;
+	table-layout: fixed;
+}
+#table td:nth-child(1), #table th:nth-child(1) {
+	width: 3%;
+	text-align: right;
+}
+#table td:nth-child(2), #table th:nth-child(2) {
+	width: 40%;
+}
+#table td:nth-child(3), #table th:nth-child(3) {
+	width: 40%;
+}
+#table td:nth-child(4), #table th:nth-child(4) {
+	width: 17%;
+	text-align: left;
+	border: 0;
+	padding-left: 10px;
+}
+#table td[contenteditable=true] {
+	background-color: #DCDCDC;
+}
+</style>
+</head>
+<body>
+
+<!-- Page navigation -->
+<div class='pageNav'>
+	<a href='../index.html'>testing</a>
+	<a href='../edit.html'>edit tests</a>
+	<a href='index.html?id='><span class='testName'/></a>
+	<a>questions</a>
+</div>
+
+<!-- Contents -->
+<h1>editing questions for <span class='testName'/></h1>
+
+<table class='border' id='table'>
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Question</th>
+			<th>Answer</th>
+			<th><input type='button' value='+ add' class='addBtn'/></th>
+		</tr>
+		<tr id='noQnsFoundRow' style='display: none;'>
+			<td colspan="3" style="text-align: center;">No questions found</td>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+
+<input type='button' value='save' class='saveBtn'/>
+<input type='button' value='cancel' class='backBtn'/>
+
+<span id='ajaxStatus'></span>
+
+</body>
+</html>
