@@ -16,7 +16,7 @@ $(document).ready(function() {
 
 	// Set initial values of the options
 	get_test_info(function(data) {
-		for(var k in data.options) {
+		for(var k in data.options) { // TODO: make sure data.options[k] === true
 			$('input[type="checkbox"][name="' +k+ '"]').prop('checked', data.options[k]);
 		}
 	});
@@ -55,9 +55,9 @@ label {
 
 <!-- Page navigation -->
 <div class='pageNav'>
-	<a href='../index.html'>testing</a>
+	<a href='../'>testing</a>
 	<a href='../edit.html'>edit tests</a>
-	<a href='index.html?id='><span class='testName'/></a>
+	<a href='./?id='><span class='testName'/></a>
 	<a>options</a>
 </div>
 

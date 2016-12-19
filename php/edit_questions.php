@@ -3,7 +3,7 @@
 // setup
 include 'class.file.php';
 $id = $_POST['id'];
-$data = (isset($_POST['data'])) ? $_POST['data'] : []; // (there's a strange bug where $_POST['data'] is not even set if an empty array is passed)
+$data = (isset($_POST['data'])) ? $_POST['data'] : array(); // (there's a strange bug where $_POST['data'] is not even set if an empty array is passed)
 
 // process changes to test_$id.json
 // initialize file

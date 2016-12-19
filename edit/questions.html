@@ -30,8 +30,10 @@ $(document).ready(function() {
 				'<td>' +(i+1)+ '</td>'+
 				'<td>' +data.questions[i].question+ '</td>' +
 				'<td>' +data.questions[i].answer+ '</td>' +
-				'<td>' +'<input type="button" value="edit" class="editBtn"/> '
-					   +'<input type="button" value="delete" class="deleteBtn"/>'+ '</td>'+
+				'<td>'
+					+'<input type="button" value="edit" class="editBtn"/> '
+					+'<input type="button" value="delete" class="deleteBtn"/>'+
+				'</td>' +
 			'</tr>';
 		}
 		$('tbody').html(body);
@@ -158,9 +160,9 @@ $(document).ready(function() {
 
 <!-- Page navigation -->
 <div class='pageNav'>
-	<a href='../index.html'>testing</a>
+	<a href='../'>testing</a>
 	<a href='../edit.html'>edit tests</a>
-	<a href='index.html?id='><span class='testName'/></a>
+	<a href='./?id='><span class='testName'/></a>
 	<a>questions</a>
 </div>
 

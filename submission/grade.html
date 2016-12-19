@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset='utf-8'>
-<title>viewing submission for </title>
+<title>grading submission for </title>
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <script src="../js/jquery.min.js"></script>
 <script src="../js/setup.js"></script>
@@ -10,12 +10,6 @@
 <script>
 $(document).ready(function() {
 	get_submission_info(function(data, id) {
-		// Put score into #testScore
-		if(data.score == null) {
-			$('#testScore').html('<a href="grade.html?id=' +id+ '">Grade this submission.</a>');
-		} else {
-			$('#testScore').html('Score: <b>' +data.score+ '</b>');
-		}
 
 		// Put data into #table
 		var content = '';
@@ -34,10 +28,56 @@ $(document).ready(function() {
 				'<td>' +data.questions[i].question+ '</td>' +
 				'<td>' +data.questions[i].user_answer+ '</td>' +
 				'<td>' +data.questions[i].answer+ '</td>' +
+				'<td>'+
+					'<input type="button" value="0" class="btnZero"/>'+
+					'<input type="button" value="&frac12;" class="btnHalf"/>'+
+					'<input type="button" value="1" class="btnOne"/>'+
+				'</td>'+	
 			'</tr>');
 		}
 		$('tbody').html(content);
 
+		// When user scores a question
+		$('#table').on('click', '.btnZero, .btnHalf, .btnOne', function(){
+			var $btn = $(this);
+			var $row = $btn.parents('tr');
+			console.log($row);
+			
+			$row.removeClass('scoreZero')
+				.removeClass('scoreHalf')
+				.removeClass('scoreOne');	
+				 if($btn.is('.btnZero')) $row.addClass('scoreZero');		
+			else if($btn.is('.btnHalf')) $row.addClass('scoreHalf');		
+			else if($btn.is('.btnOne')) $row.addClass('scoreOne');		
+		});
+
+		// When user presses .saveBtn
+		$('.saveBtn').on('click', function() {
+			// create a data array
+			var data = [];
+			$('#table tbody tr').each(function() {
+				var $row = $(this);
+				if($row.hasClass('scoreZero')) data.push(0);
+				else if($row.hasClass('scoreHalf')) data.push(0.5);
+				else if($row.hasClass('scoreOne')) data.push(1);
+				else data.push(null);
+			});
+
+			// send ajax request to grade submission
+			$('#ajaxStatus').html('Loading...');
+			$.ajax({
+				url: '../php/grade_submission.php',
+				data: {id: id, data: data},
+				success: function(response) {
+					if(response.indexOf('./?id=') == -1) {
+						$('#ajaxStatus').html(response);
+						return;
+					}
+					$('#ajaxStatus').html('');
+					window.location.href = response;
+				}
+			});
+		});
 	});
 });
 </script>
@@ -52,13 +92,17 @@ $(document).ready(function() {
 	text-align: right;
 }
 #table td:nth-child(2), #table th:nth-child(2) {
-	width: 27%;
+	width: 28%;
 }
 #table td:nth-child(3), #table th:nth-child(3) {
-	width: 35%;
+	width: 32%;
 }
 #table td:nth-child(4), #table th:nth-child(4) {
-	width: 35%;
+	width: 32%;
+}
+#table td:nth-child(5), #table th:nth-child(5) {
+	width: 8%;
+	text-align: center;
 }
 #table tr.scoreZero { background-color: #ebcccc; }
 #table tr.scoreHalf { background-color: #faf2cc; }
@@ -72,15 +116,13 @@ $(document).ready(function() {
 <div class='pageNav'>
 	<a href='../'>testing</a>
 	<a href='../submissions.html'>past submissions</a>
-	<a>viewing submission for <span class='testName'></span></a>
+	<a>grading submission for <span class='testName'></span></a>
 </div>
 
 <!-- Contents -->
-<h1>viewing submission for <span class='testName'/></h1>
+<h1>grading submission for <span class='testName'/></h1>
 
 <p>Submitted on <span id='dateString'></span>.</p>
-
-<p id='testScore'></p>
 
 <table id='table' class='border'>
 	<thead>
@@ -89,6 +131,7 @@ $(document).ready(function() {
 			<th>Question</th>
 			<th>User's Answer</th>
 			<th>Actual Answer</th>
+			<th>Score</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -96,7 +139,8 @@ $(document).ready(function() {
 	</tbody>
 </table>
 
-<input type='button' value='done' class='backBtn'/>
+<input type='button' value='save' class='saveBtn'/>
+<input type='button' value='cancel' class='backBtn'/>
 
 <span id='ajaxStatus'></span>
 

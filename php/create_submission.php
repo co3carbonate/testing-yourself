@@ -14,13 +14,15 @@ $test_file = new file('../json/tests/test_' .$id. '.json');
 $test_arr = $test_file->readJSON();
 $test_file->close();
 
-// write the test's name, questions, answers, and actual information about the submission (user's answers, etc.) to the submission data file
+// write the test's name, questions, answers, score, and actual information about the submission (user's answers, etc.) to the submission data file
 $submission_file_arr = array(
 	'name' => $test_arr['name'],
-	'questions' => $test_arr['questions']
+	'questions' => $test_arr['questions'],
+	'score' => null
 );
 for($i = 0, $l = count($data); $i < $l; $i++) {
 	$submission_file_arr['questions'][$i]['user_answer'] = $data[$i]['answer'];
+	$submission_file_arr['questions'][$i]['score'] = null;
 }
 $submission_file->writeJSON($submission_file_arr);
 $submission_file->close();
@@ -34,7 +36,8 @@ $submission_list = $submission_list_file->readJSON();
 $submission_list[] = array(
 	'test_id' => $id,
 	'name' => $test_arr['name'],
-	'id' => $time
+	'id' => $time,
+	'score' => null
 );
 
 // write to submission_list.json
