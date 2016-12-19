@@ -5,6 +5,14 @@ include 'class.file.php';
 $id = $_POST['id'];
 $data = $_POST['data'];
 
+// bug: booleans in $data are converted to string values
+//		i.e. true => 'true', false => 'false'
+//		we need to convert them back
+foreach($data as $k => $v) {
+	if($v === 'true') $data[$k] = true;
+	else if($v === 'false') $data[$k] = false; 
+}
+
 // process changes to test_$id.json
 // initialize file
 $test_file = new file('../json/tests/test_'.$id.'.json');

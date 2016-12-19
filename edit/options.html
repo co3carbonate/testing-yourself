@@ -16,8 +16,8 @@ $(document).ready(function() {
 
 	// Set initial values of the options
 	get_test_info(function(data) {
-		for(var k in data.options) {
-			$('input[type=checkbox][name="' +k+ '"]').attr('checked', data.options[k]);
+		for(var k in data.options) { // TODO: make sure data.options[k] === true
+			$('input[type="checkbox"][name="' +k+ '"]').prop('checked', data.options[k]);
 		}
 	});
 
@@ -27,7 +27,7 @@ $(document).ready(function() {
 		var data = {};
 		$('input[type=checkbox][name]').each(function() {
 			var $checkbox = $(this);
-			data[$checkbox.attr('name')] = $checkbox.is(':checked');
+			data[$checkbox.attr('name')] = $checkbox.prop('checked');
 		});
 
 		// send ajax request to edit options
