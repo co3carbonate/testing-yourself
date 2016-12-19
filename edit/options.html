@@ -16,7 +16,7 @@ $(document).ready(function() {
 
 	// Set initial values of the options
 	get_test_info(function(data) {
-		for(var k in data.options) { // TODO: make sure data.options[k] === true
+		for(var k in data.options) {
 			$('input[type="checkbox"][name="' +k+ '"]').prop('checked', data.options[k]);
 		}
 	});
