@@ -13,35 +13,19 @@ $(document).ready(function() {
 		url: 'json/submission_list.json',
 		dataType: 'JSON',
 		success: function(data) {
-			// Loop through submissions and create contents array
-			var contents = [];
-			var prev_date = new Date(0); // defaults to Jan 1 1970
+			// Loop through submissions and generate table contents
+			var content = '';
 			for(var i = data.length - 1; i >= 0; i--) {
-				// If this submission is on a different day from the previous,
-				// create new element container
 				var current_date = new Date(0);
 				current_date.setUTCSeconds(data[i].id);
-				if(current_date.toDateString() != prev_date.toDateString()) {
-					contents.push({
-						'day': dateStr(data[i].id),
-						'content': ''
-					});
-				}
+				var date_str = dateStr(data[i].id)+ ' ' +formatAMPM(current_date);
 
-				contents[contents.length - 1].content +=
-					'<li><a target="_blank" href="submission/?id=' +data[i].id+ '">' +
-					data[i].name+ ' submission at ' +formatAMPM(current_date)+
-					'</a></li>';
-				prev_date = current_date;
+				content += '<tr>'+
+					'<td>' +date_str+ '</td>'+
+					'<td><a target="_blank" href="submission/?id=' +data[i].id+ '">' +data[i].name+ '</td>'+
+				'</tr>';
 			}
 
-			// Set #submissions
-			var content = '';
-			for(var i = 0, l = contents.length; i < l; i++) {
-				content += 
-					'<h2>' +contents[i].day+ '</h2>' +
-					'<ul>' +contents[i].content+ '</ul>';
-			}
 			$('#submissions').html(content);
 		}
 	});
@@ -60,7 +44,10 @@ $(document).ready(function() {
 
 <h1>view submissions</h1>
 
-<div id='submissions'></div>
+<table class='border'>
+	<thead><tr><th>Time</th><th>Test</th></tr></thead>
+	<tbody id='submissions'></tbody>
+</table>
 
 <input type='button' value='done' class='backBtn'/>
 
